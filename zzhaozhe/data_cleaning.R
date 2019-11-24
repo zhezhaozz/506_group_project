@@ -109,9 +109,12 @@ dt15 = dt15 %>%
   .[, .(id = SEQN,
         gender = RIAGENDR, age = RIDAGEYR, race = RIDRETH3,
         bmi = BMXBMI, BPXSY1, BPXDI1, BPXSY2, BPXDI2, BPXSY3, BPXDI3, BPXSY4, BPXDI4,
-        alchol = ALQ120Q, sleep = SLD012, smoke = SMQ681, workhrs = OCQ180)] %>%
+        alchol = ALQ120Q, sleep = SLD012, smoke = SMQ681, workhrs = OCQ180,
+        alcohol_unit = ALQ120U)] %>%
   ## eliminate missing values
-  na.omit(., cols = c(1:11,14:17)) 
+  na.omit(., cols = c(1:11,14:17)) %>%
+  ## create variable year
+  .[, year := "2015-2016" ]
   
 ## 2013 - 2014
 dt13 = dt13 %>%
@@ -127,9 +130,12 @@ dt13 = dt13 %>%
   .[, .(id = SEQN,
         gender = RIAGENDR, age = RIDAGEYR, race = RIDRETH3,
         bmi = BMXBMI, BPXSY1, BPXDI1, BPXSY2, BPXDI2, BPXSY3, BPXDI3, BPXSY4, BPXDI4,
-        alchol = ALQ120Q, sleep = SLD010H, smoke = SMQ681, workhrs = OCQ180)] %>%
+        alchol = ALQ120Q, sleep = SLD010H, smoke = SMQ681, workhrs = OCQ180,
+        alcohol_unit = ALQ120U)] %>%
   ## eliminate missing values
-  na.omit(., cols = c(1:11,14:17)) 
+  na.omit(., cols = c(1:11,14:17)) %>%
+  ## create variable year
+  .[, year := "2013-2014" ]
   
 ## 2011 - 2012
 dt11 = dt11 %>%
@@ -145,13 +151,28 @@ dt11 = dt11 %>%
   .[, .(id = SEQN,
         gender = RIAGENDR, age = RIDAGEYR, race = RIDRETH3,
         bmi = BMXBMI, BPXSY1, BPXDI1, BPXSY2, BPXDI2, BPXSY3, BPXDI3, BPXSY4, BPXDI4,
-        alchol = ALQ120Q, sleep = SLD010H, smoke = SMQ680, workhrs = OCQ180)] %>%
+        alchol = ALQ120Q, sleep = SLD010H, smoke = SMQ680, workhrs = OCQ180,
+        alcohol_unit = ALQ120U)] %>%
   ## eliminate missing values
-  na.omit(., cols = c(1:11,14:17)) 
+  na.omit(., cols = c(1:11,14:17)) %>%
+  ## create variable year
+  .[, year := "2011-2012" ]
 
 ## full data 
 full_dt = rbind(dt15, dt13, dt11)
 
 # fwrite(full_dt, "project_data.csv")
 
+# re-encode variables ------------------------------------------------
+analysis_dt = 
+  full_dt[, .(id,
+              avg_sys_bp = (BPXSY1 + BPXSY2 + BPXSY3)/3,
+              avg_dia_bp = (BPXDI1 + BPXDI2 + BPXDI3)/3,
+              gender, age, race, bmi, sleep, smoke, workhrs, alchol, 
+              alcohol_unit, year) ] %>% 
+  .[, alchol := ifelse(alcohol_unit == 2, alchol/4.345, alchol) ] %>%
+  .[, alchol := ifelse(alcohol_unit == 3, alchol/52.143, alchol) ] %>%
+  .[, sleep := ifelse( {year == "2015-2016" & sleep >= 12}, 12, sleep )]
+  
+# fwrite(analysis_dt, "cleaned_data.csv")
 
