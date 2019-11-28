@@ -1,6 +1,7 @@
 library(haven)
 library(data.table)
 library(magrittr)
+library(future)
 
 # download data ----------------------------------------------------------------
 ## 2015 - 2016
@@ -34,7 +35,7 @@ smoke11 = read_xpt('https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/SMQRTU_G.XPT')
 take_pre11 = read_xpt('https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/BPQ_G.XPT')
 
 # if variables got cleaned, run this code to get data set
-full_dt = fread("~/Desktop/Math_Courses/Umich/506/506_group_project/project_data.csv")
+full_dt = fread("project_data.csv")
 
 # join data tables -------------------------------------------------------------
 ## 2015 - 2016
@@ -168,11 +169,15 @@ analysis_dt =
   full_dt[, .(id,
               avg_sys_bp = (BPXSY1 + BPXSY2 + BPXSY3)/3,
               avg_dia_bp = (BPXDI1 + BPXDI2 + BPXDI3)/3,
-              gender, age, race, bmi, sleep, smoke, workhrs, alchol, 
+              gender, age, bmi, sleep, smoke, workhrs, alchol, 
               alcohol_unit, year) ] %>% 
-  .[, alchol := ifelse(alcohol_unit == 2, alchol/4.345, alchol) ] %>%
-  .[, alchol := ifelse(alcohol_unit == 3, alchol/52.143, alchol) ] %>%
-  .[, sleep := ifelse( {year == "2015-2016" & sleep >= 12}, 12, sleep )]
+  .[, alchol := ifelse(alcohol_unit == 2, round(alchol/4.345, 3), alchol) ] %>%
+  .[, alchol := ifelse(alcohol_unit == 3, round(alchol/52.143, 3), alchol) ] %>%
+  .[, sleep := ifelse( {year == "2015-2016" & sleep >= 12}, 12, sleep )] %>%
+  .[, `:=` (gender = ifelse(gender == 1, 0, 1),
+            smoke = ifelse(smoke == 1, 1, 0),
+            workhrs = ifelse(workhrs > 40, 1, 0)
+            )]
   
 # fwrite(analysis_dt, "cleaned_data.csv")
 
