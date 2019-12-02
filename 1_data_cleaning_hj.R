@@ -1,6 +1,3 @@
-#NEED TO DROP RACE
-#TRANSFORM ALCOHOL
-
 #This script include data cleaning process for the STATS506 group project.
 #The dplyr package is used for data cleaning.
 #Author: Hyesue Jang
@@ -135,7 +132,10 @@ df11 = df11 %>%
             workhrs = OCQ180) %>%
   #remove missing values
   #except for the optional BPXSY4, BPXDI4 variables
-  drop_na(-c("BPXSY4", "BPXDI4")) %>% 
+  drop_na(-c("BPXSY1", "BPXDI1", 
+             "BPXSY2", "BPXDI2",
+             "BPXSY3", "BPXDI3",
+             "BPXSY4", "BPXDI4")) %>% 
   #finally, add survey_year as variable
   #this will be used for testing random effects later
   mutate(survey_year = "2011-2012")
@@ -167,7 +167,10 @@ df13 = df13 %>%
             workhrs = OCQ180) %>%
   #remove missing values
   #except for the optional BPXSY4, BPXDI4 variables
-  drop_na(-c("BPXSY4", "BPXDI4")) %>% 
+  drop_na(-c("BPXSY1", "BPXDI1", 
+             "BPXSY2", "BPXDI2",
+             "BPXSY3", "BPXDI3",
+             "BPXSY4", "BPXDI4")) %>% 
   #finally, add survey_year as variable
   #this will be used for testing random effects later
   mutate(survey_year = "2013-2014")
@@ -199,14 +202,17 @@ df15 = df15 %>%
             workhrs = OCQ180) %>%
   #remove missing values
   #except for the optional BPXSY4, BPXDI4 variables
-  drop_na(-c("BPXSY4", "BPXDI4")) %>% 
+  drop_na(-c("BPXSY1", "BPXDI1", 
+             "BPXSY2", "BPXDI2",
+             "BPXSY3", "BPXDI3",
+             "BPXSY4", "BPXDI4")) %>% 
   #finally, add survey_year as variable
   #this will be used for testing random effects later
   mutate(survey_year = "2015-2016")
 
 #combine three data sets into one
 final_data = rbind(df11, df13, df15)
-final_data = final_data %>% select(-c("race", "BPXSY4", "BPXDI4"))
+final_data = final_data %>% select(-c("race"))
 
 #save final data set
 write.csv(final_data, "~/Box/HJ_main/2_Courses/STATS 506/Group Project/hyesue/data/final_data.csv", row.names = FALSE)
