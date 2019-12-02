@@ -5,13 +5,14 @@
 
 rm(list=ls())
 library(dplyr)
+library(tidyr) #for drop_na() function
 library(nlme)
 
 #data cleaning ----------------------------------------------
 #read in data
 df = read.csv("~/Box/HJ_main/2_Courses/STATS 506/Group Project/hyesue/data/final_data.csv")
 
-names(df)
+#names(df)
 df = df %>% 
   mutate(
     #factor categorical variables
@@ -19,8 +20,8 @@ df = df %>%
                     levels = c(1,2), 
                     labels = c("male","female")),
     alcohol_unit = factor(df$alcohol_unit,
-                         levels = c(1,2,3),
-                         labels = c("week", "month", "year")),
+                          levels = c(1,2,3),
+                          labels = c("week", "month", "year")),
     smoke = factor(df$smoke,
                    levels = c(1,2),
                    labels = c("Smoked", "NotSmoked")),
@@ -33,6 +34,9 @@ df = df %>%
     SBP_bi = ifelse(SBP < 140, 0, 1),
     DBP_bi = ifelse(DBP < 90, 0, 1)) %>%
   drop_na(c("SBP", "DBP"))
+
+#remove those with incomplete BP measures 
+df = quantable::removeNArows(df, 2)
 
 #recode alcohol variables
 #measure of units differ by respondent (week, month, year)
@@ -83,7 +87,7 @@ car::avPlots(avplot_DBP) #for DBP
 model_SBP = gls(SBP ~ overtime + gender + age + bmi + 
                   alcohol_adj + sleep + smoke, data = df)
 summary(model_SBP)
-model_DBP = gls(DBP ~ workhrs + gender + age + bmi + 
+model_DBP = gls(DBP ~ overtime + gender + age + bmi + 
                   alcohol_adj + sleep + smoke, data = df)
 summary(model_DBP)
 
