@@ -1,7 +1,7 @@
 library(haven)
 library(data.table)
 library(magrittr)
-library(future)
+library(quantable)
 
 # download data ----------------------------------------------------------------
 ## 2015 - 2016
@@ -35,7 +35,7 @@ smoke11 = read_xpt('https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/SMQRTU_G.XPT')
 take_pre11 = read_xpt('https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/BPQ_G.XPT')
 
 # if variables got cleaned, run this code to get data set
-full_dt = fread("project_data.csv")
+# full_dt = fread("project_data.csv")
 
 # join data tables -------------------------------------------------------------
 ## 2015 - 2016
@@ -113,7 +113,7 @@ dt15 = dt15 %>%
         alchol = ALQ120Q, sleep = SLD012, smoke = SMQ681, workhrs = OCQ180,
         alcohol_unit = ALQ120U)] %>%
   ## eliminate missing values
-  na.omit(., cols = c(1:11,14:17)) %>%
+  na.omit(., cols = c(1:5,14:17)) %>%
   ## create variable year
   .[, year := "2015-2016" ]
   
@@ -134,9 +134,9 @@ dt13 = dt13 %>%
         alchol = ALQ120Q, sleep = SLD010H, smoke = SMQ681, workhrs = OCQ180,
         alcohol_unit = ALQ120U)] %>%
   ## eliminate missing values
-  na.omit(., cols = c(1:11,14:17)) %>%
+  na.omit(., cols = c(1:5,14:17)) %>%
   ## create variable year
-  .[, year := "2013-2014" ]
+  .[, year := "2013-2014" ] 
   
 ## 2011 - 2012
 dt11 = dt11 %>%
@@ -155,7 +155,7 @@ dt11 = dt11 %>%
         alchol = ALQ120Q, sleep = SLD010H, smoke = SMQ680, workhrs = OCQ180,
         alcohol_unit = ALQ120U)] %>%
   ## eliminate missing values
-  na.omit(., cols = c(1:11,14:17)) %>%
+  na.omit(., cols = c(1:5,14:17)) %>%
   ## create variable year
   .[, year := "2011-2012" ]
 
@@ -165,19 +165,21 @@ full_dt = rbind(dt15, dt13, dt11)
 # fwrite(full_dt, "project_data.csv")
 
 # re-encode variables ------------------------------------------------
-analysis_dt = 
-  full_dt[, .(id,
-              avg_sys_bp = (BPXSY1 + BPXSY2 + BPXSY3)/3,
-              avg_dia_bp = (BPXDI1 + BPXDI2 + BPXDI3)/3,
-              gender, age, bmi, sleep, smoke, workhrs, alchol, 
-              alcohol_unit, year) ] %>% 
+analysis_dt = removeNArows(full_dt, 2) %>%
+  .[, avg_sys_bp := rowMeans(.SD, na.rm = TRUE),
+          .SDcols = c("BPXSY1", "BPXSY2", "BPXSY3", "BPXSY4") ] %>% 
+  .[, .(id,
+        avg_sys_bp,
+        avg_dia_bp = rowMeans(.SD, na.rm = TRUE),
+        gender, age, bmi, alchol, sleep, smoke, workhrs, alcohol_unit, year), 
+    .SDcols = c("BPXDI1", "BPXDI2", "BPXDI3", "BPXDI4")] %>%
   .[, alchol := ifelse(alcohol_unit == 2, round(alchol/4.345, 3), alchol) ] %>%
   .[, alchol := ifelse(alcohol_unit == 3, round(alchol/52.143, 3), alchol) ] %>%
   .[, sleep := ifelse( {year == "2015-2016" & sleep >= 12}, 12, sleep )] %>%
   .[, `:=` (gender = ifelse(gender == 1, 0, 1),
             smoke = ifelse(smoke == 1, 1, 0),
             workhrs = ifelse(workhrs > 40, 1, 0)
-            )]
+            )] %>%
+  na.omit(., c(2,3))
   
 # fwrite(analysis_dt, "cleaned_data.csv")
-

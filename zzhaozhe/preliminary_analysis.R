@@ -80,6 +80,11 @@ lm_a_x = lm(age ~ gender + bmi + sleep + smoke + workhrs + alchol,
 residual_x_age = rstandard(lm_a_x)
 
 plot(residual_x_age, residual_y_age) # added variable plot given age
+
+sp_age = smooth.spline(residual_x_age, residual_y_age, df = 3)
+
+lines(sp_age, col = "red")
+
 # age has non linear pattern
 
 ## added variable plot for bmi
@@ -92,6 +97,10 @@ lm_b_x = lm(bmi ~ gender + age + sleep + smoke + workhrs + alchol,
 residual_x_bmi = rstandard(lm_b_x)
 
 plot(residual_x_bmi, residual_y_bmi) # added variable plot given age
+
+sp_bmi = smooth.spline(residual_x_bmi, residual_y_bmi, df = 5)
+
+lines(sp_bmi, col = "red")
 
 ## added variable plot for sleep
 lm_s = lm(avg_sys_bp ~ gender + age + bmi + smoke + workhrs + alchol,
@@ -115,5 +124,19 @@ residual_x_alchol = rstandard(lm_al_x)
 
 plot(residual_x_alchol, residual_y_alchol) # added variable plot given age
 # non-linear for alchol
+
+
+# Core model -------------------------------------------------------------------
+core_fit = lm(avg_sys_bp ~ gender + age + bmi + sleep + smoke + workhrs + 
+                as.factor(alchol) + gender:smoke:as.factor(alchol), 
+              data = analysis_dt)
+
+summary(core_fit)
+
+core_fit = lm(log(avg_sys_bp, base = 2) ~ gender + age + bmi + sleep + smoke + workhrs + 
+                alchol, 
+              data = analysis_dt)
+
+plot(analysis_dt$age, log(analysis_dt$avg_sys_bp))
 
 
