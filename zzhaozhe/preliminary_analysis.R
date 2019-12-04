@@ -26,6 +26,7 @@ hist(analysis_dt$alchol)
 pre_sys_fit = lm(avg_sys_bp ~ gender + age + bmi + sleep + smoke + workhrs + alchol,
              data = analysis_dt)
 
+summary(pre_sys_fit)
 ## standardized residuals plot
 st_sys_red = rstandard(pre_sys_fit)
 fitted_sys = pre_sys_fit$fitted.values
@@ -126,17 +127,6 @@ plot(residual_x_alchol, residual_y_alchol) # added variable plot given age
 # non-linear for alchol
 
 
-# Core model -------------------------------------------------------------------
-core_fit = lm(avg_sys_bp ~ gender + age + bmi + sleep + smoke + workhrs + 
-                as.factor(alchol) + gender:smoke:as.factor(alchol), 
-              data = analysis_dt)
 
-summary(core_fit)
-
-core_fit = lm(log(avg_sys_bp, base = 2) ~ gender + age + bmi + sleep + smoke + workhrs + 
-                alchol, 
-              data = analysis_dt)
-
-plot(analysis_dt$age, log(analysis_dt$avg_sys_bp))
 
 
