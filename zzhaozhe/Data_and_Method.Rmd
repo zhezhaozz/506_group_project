@@ -1,0 +1,75 @@
+---
+title: "Data"
+output: html_document
+---
+
+## Data Selction and Cleaning
+The study population are participants, aged 18 - 60 and employed, of The National 
+Health and Nutrition Examination Survey (NHANES) program in three two-years cycles: 2011-2012, 2013-2014 and 2015-2016. Among them, 2011-2012 cycle consists of 2495 
+sample size, 2013-2014 cycle contains 2819 and 2015-2016 cycle includes 2799. For 
+the purpose of this study, we exclude people who are now taking prescription due 
+to hypertension. The exclusion leads to huge amount of reduction to our sample 
+size: there are 100 observations left for 2011-2012, 95 for 2013-2014 and 140 for 
+2015-2016.
+
+Among 335 total sample sizes, we picked variables through literature reviews and
+group discussion. Dataset varies for each two-years cycle by the suffix in the name. 
+2011-2012 is G, 2013-2014 is H, and 2015-2016 is I. For the convenience, the suffix
+will be replaced by *. Variables chosen are listed below:
+
+The measurements of blood pressure: Systolic blood pressure and Diastolic blood 
+pressure from BPX_* dataset. Each blood pressure are measured in 3 trails, sometimes
+4 trials,
+
+working hours in the last week from OCQ_* dataset,
+
+Body mass index from BMX_* dataset,
+
+demographic data: age and gender from DEMO_* dataset,
+
+Alchol use in the last 12 months: ALQ120Q for the quantity and ALQ120U to differentiate
+unit of week, month or year, from ALQ_* dataset,
+
+Smoked tobacco in last five days: SMQ681 in 2013-2016, and SMQ680 in 2011-2012, 
+from SMQRTU_* dataset,
+
+sleeping hours in working days: SLD012 in 2015-2016, and SLD010H for others from
+SLQ_* dataset.
+
+The cleaning process involves excluding missing values for complete case analysis,
+and excludig cases where there are more than 2 trails blood pressure measurements 
+missing. After the cleaning process, the sample size for this study is 238 in total.
+
+
+## Method
+This study will implement multiple regression on each type (systolic and diatolic) 
+blood pressure against working hours controlled by all other variables to assess 
+if working overtimes would causehigher blood pressure. Coefficients and their 
+p-value on statistic significance are reported.
+
+The response variable blood pressure will be the average value of blood pressures
+measured in 3 trails (sometimes 4 if one trial is missing); working hours is encoded
+into dichotomy variable where 1 stands for working more than 40 hours and 0 otherwise;
+alchol drinks are converted to average drinks in a week, so values with unit month
+is divided by 4.345 and 52.143 for values with unit year. 3 digits are preserved; 
+due to the difference of encoding of sleep variable in 2015-2016 (it has 14 meaning 
+more 14 hours, but this limit is 12 in 2011-2014), we recode all sleep hours that 
+are more than 12 to 12 to keep the consistency in sample dataset.
+
+The additional analysis involves adding interactions, transformations to our classical
+linear model. Logistics regression is applied to solve the research question in 
+a different thinking.
+
+We use data.table package, dplyr package and python for the data preparation process.
+The multiple regression is implemented in python, lm function and gls function in 
+R.
+
+
+
+
+
+
+
+
+
+
