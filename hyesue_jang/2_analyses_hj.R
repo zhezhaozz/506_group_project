@@ -1,6 +1,5 @@
-
 #This script include initial and main analyses for the STATS506 group project.
-#"Does working overtime predict abnormal blood pressure?"
+#Project title: "Does working overtime predict abnormal blood pressure?"
 #Author: Hyesue Jang
 
 rm(list=ls())
@@ -65,7 +64,7 @@ hist(df$SBP_bi)
 hist(df$DBP_bi)
 
 #assumption2) consistent variances
-#for SPB
+#for SBP
 pairs(SBP ~ overtime + gender + age + bmi +
         alcohol_adj + sleep + smoke, data = df)
 #for DBP
@@ -74,13 +73,51 @@ pairs(DBP ~ overtime + gender + age + bmi +
 
 #assumption3) linearity
 #first fit a linear regression with all covariates
-avplot_SBP = lm(SBP ~ overtime + gender + age + bmi + 
+prelim_SBP = lm(SBP ~ overtime + gender + age + bmi + 
                   alcohol_adj + sleep + smoke, data = df)
-avplot_DBP = lm(DBP ~ overtime + gender + age + bmi + 
+prelim_DBP = lm(DBP ~ overtime + gender + age + bmi + 
                   alcohol_adj + sleep + smoke, data = df)
 #then see the added variable plots
-car::avPlots(avplot_SBP) #for SBP
-car::avPlots(avplot_DBP) #for DBP
+car::avPlots(prelim_SBP) #for SBP
+car::avPlots(prelim_DBP) #for DBP
+
+#standardized residuals plots (SBP)
+SBP_red = rstandard(prelim_SBP)
+fitted_SBP = prelim_SBP$fitted.values
+
+plot(fitted_SBP, SBP_red, xlab = "Fitted Values", 
+     ylab = "Standardized Residuals", 
+     main = "Standardized Residuals Plot (SBP)")
+
+#standardized residuals plots (DBP)
+DBP_red = rstandard(prelim_DBP)
+fitted_DBP = prelim_DBP$fitted.values
+
+plot(fitted_DBP, DBP_red, xlab = "Fitted Values", 
+     ylab = "Standardized Residuals", 
+     main = "Standardized Residuals Plot (DBP)")
+
+#assumption4) multicollinearity
+#collinearity for continuous variables
+cont_df = df %>% 
+  select(age, bmi, alcohol_adj, sleep)
+cor(cont_df) 
+#correlation coefficients have small values
+
+#collinearity for categorical variables
+cate_df = df %>%
+  select(gender, smoke, overtime)
+chisq.test(cate_df$gender, cate_df$smoke)
+chisq.test(cate_df$gender, cate_df$overtime)
+chisq.test(cate_df$smoke, cate_df$overtime)
+#no significant associations
+
+#lastly, vif can be additionally checked for collinearity
+car::vif(prelim_SBP)
+car::vif(prelim_DBP)
+#VIF suggests that there is collinearity is not problematic.
+#rule of thumb: less than 1 = not correlated; 1-5 = moderately correlated
+
 
 #core analysis ----------------------------------------------
 #linear regression with "overtime" as the main predictor
