@@ -1,0 +1,28 @@
+---
+title: "Group Project Report (draft)"
+author: "Hyesue Jang"
+date: "12/3/2019"
+output: html_document
+---
+
+# Introduction
+
+According to the American Time Use Survey (ATUS, https://www.bls.gov/charts/american-time-use/activity-by-work.htm), 85.8 percent of males and 66.5 percent of females work more than 40 hours per week in the U.S. Working overtime has been associated with diverse health problems, especially ischemic heart diseases and cerebrovascular diseases (Nishiyama & Johnson, 1997). Therefore, this project aims to examine whether working overtime is associated with abnormal blood pressure using the National Health and Nutrition Examination Survey (NHANES) data.
+
+It is well known that various biological and environmental factors influence the blood pressure level (Lauer, 1993; Papathanasiou, 2015). To control for the potential influences of such factors, we have systematically reviewed the literature to select the important factors that might affect the abnormal blood pressure levels of the respondents. Final predictors included in the model were gender, age, body mass index (bmi), alcohol consumption level, hours of sleep, and history of smoking. These final predictors closely matched with those from other published studies that observed the association between work hours and blood pressure levels  (Hayashi, 1996; Nakamura et al. 2012).
+
+In terms of defining the criteria for the key variables of interest, working overtime were defined as working more than 40 hours per week. Abnormal blood pressure was defined as having systolic blood pressure higher than 140mm Hg and diastolic blood pressure higher than 90mm Hg following the guide from the American Heart Association. 
+
+In summary, this study will examine whether working overtime (> 40 hours) is associated with the risk of having abnormal systolic and diatolic blood pressure level after controlling for other factors that could affect the risk.
+
+# References
+
+Hayashi, T., Kobayashi, Y., Yamaoka, K., & Yano, E. (1996). Effect of overtime work on 24-hour ambulatory blood pressure. Journal of occupational and environmental medicine, 38(10), 1007-1011.
+
+Lauer, R. M., Mahoney, L. T., Clarke, W. R., & Witt, J. (1993). Childhood predictors for high adult blood pressure: the Muscatine Study. Pediatric Clinics of North America, 40(1), 23-40.
+
+Nakamura, K., Sakurai, M., Morikawa, Y., Miura, K., Ishizaki, M., Kido, T., ... & Nakagawa, H. (2012). Overtime work and blood pressure in normotensive Japanese male workers. American journal of hypertension, 25(9), 979-985.
+
+Nishiyama, K., & Johnson, J. V. (1997). Karoshi--death from overwork: occupational health consequences of Japanese production management. International Journal of Health Services, 27(4), 625-641.
+
+Papathanasiou, G., Zerva, E., Zacharis, I., Papandreou, M., Papageorgiou, E., Tzima, C., ... & Evangelou, A. (2015). Association of high blood pressure with body mass index, smoking and physical activity in healthy young adults. The open cardiovascular medicine journal, 9, 5.
