@@ -1,0 +1,231 @@
+---
+title: "Core Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(magrittr)
+library(splines)
+library(car)
+library(effects)
+library(dplyr)
+
+# read the data
+dt = fread("cleaned_data.csv")
+analysis_dt = fread("cleaned_data.csv")
+```
+
+As we have got a nice cleaned dataset, we want to visualize our data with pair plots first. As shown in the pair plots for the systolic blood pressure, specifically from the scatter plots, we can find that there are weak relations or almost no relations between the variables. Moreover, from the histograms, we can find that the all the variables seem not to be normally distributed. Athough the variable systolic blood pressure and the variable bmi approach to be normally distributed, they are still right skewed. In addition, as shown in the pair plots for the diatolic blood pressure, from the scatter plots, again, we can find that there are weak relations or almost no relations between the variables. Also, from the histograms, except that the variable diatolic blood pressure seems to be almost normally distributed (only a little bit left skewed), all the other variables are not normally distributed.
+
+```{r matrix_plot}
+pairs( ~avg_sys_bp + gender + age + bmi + sleep + smoke + workhrs +
+         alchol, data = analysis_dt, main = "simple matrix plot for Systolic blood pressure")
+```
+```{r matrix plot}
+pairs( ~avg_dia_bp + gender + age + bmi + sleep + smoke + workhrs +
+         alchol, data = analysis_dt, main = "simple matrix plot for Diastolic blood pressure")
+```
+```{r histogram}
+par( mfrow=c(3,2) )
+hist(analysis_dt$avg_sys_bp)
+hist(analysis_dt$avg_dia_bp)
+hist(analysis_dt$age)
+hist(analysis_dt$bmi)
+hist(analysis_dt$sleep)
+hist(analysis_dt$alchol)
+```
+
+After exploring the data through vizualizing with pair plots, we fit our linear regression models.
+
+\
+For the systolic blood pressure, we fit the model: 
+
+$$
+\begin{aligned}
+ y &= \beta_{0} + \beta_{workhrs}*x_{workhrs} + \beta_{gender}*x_{gender} + \beta_{age}*x_{age} + \beta_{bmi}*x_{bmi} \notag\\
+ &+ \beta_{sleep}*x_{sleep} + \beta_{smoke}*x_{smoke} + \beta_{avg\_alcohol\_freq\_wk}*x_{avg\_alcohol\_freq\_wk} + \epsilon
+\end{aligned}
+$$
+
+And for diatolic blood pressure, we fit the model: 
+$$
+\begin{aligned}
+ y &= \beta_{0} + \beta_{workhrs}*x_{workhrs} + \beta_{gender}*x_{gender} + \beta_{age}*x_{age} + \beta_{bmi}*x_{bmi} \notag\\
+ &+ \beta_{sleep}*x_{sleep} +  \beta_{smoke}*x_{smoke} + \beta_{avg\_alcohol\_freq\_wk}*x_{avg\_alcohol\_freq\_wk} + \epsilon
+\end{aligned}
+$$
+
+```{r models systolic bp}
+## systolic bp
+pre_sys_fit = lm(avg_sys_bp ~ gender + age + bmi + sleep + smoke + workhrs + alchol,
+             data = analysis_dt)
+
+summary(pre_sys_fit)
+```
+```{r models diatolic bp}
+## diatolic bp
+pre_dia_fit = lm(avg_dia_bp ~ gender + age + sleep + smoke + workhrs + alchol,
+                 data = analysis_dt)
+ 
+summary(pre_dia_fit)
+```
+
+From the summary results of the linear regression model for the systolic blood pressure, we can find that although the coefficient of the working hours is positive, which implies that working overtime increases the risk of high systolic blood pressure, this effect is not significant ($\beta = 1.58$, p = 0.557). As a result, we can conclude that working overtime cannot lead to abnormal systolic blood pressure. Besides, from the summary results of the linear regression model for the diatolic blood pressure, we can find that although the coefficient of the working hours is positive as well, which implies that working overtime increases the risk of high diatolic blood pressure too, this effect is not significant as well($\beta = 0.2246$, p = 0.905). As a result, we can conclude that working overtime also cannot lead to abnormal diatolic blood pressure. Therefore, in conclusion, working overtime also cannot lead to abnormal blood pressure.
+
+\
+After fitting the linear regression model, we want to check whether the following assumptions of the linear regression model are held:
+
+\
+1. Homoscedasticity: The variance of the residual is constant. 
+2. Linearity: The relationship between between the independent and dependent variables is linear.
+3. No or little multicollinearity: There is no or little collinearity between independent variables.
+
+\
+1. Homoscedasticity
+
+\
+In order to check the homoscedasticity assumption, we plotted residual plots for both systolic blood pressure and diatolic pressure.
+
+```{r residuals plot}
+par( mfrow=c(1,2) )
+## standardized residuals plot for systolic bp
+st_sys_red = rstandard(pre_sys_fit)
+fitted_sys = pre_sys_fit$fitted.values
+
+plot(fitted_sys, st_sys_red, xlab = "fitted values", 
+     ylab = "standardized residuals", 
+     main = "standardized residuals plot (systolic bp)")
+
+## standardized residuals plot for diatolic bp
+st_dia_red = rstandard(pre_dia_fit)
+fitted_dia = pre_sys_fit$fitted.values
+
+plot(fitted_dia, st_dia_red, xlab = "fitted values", 
+     ylab = "standardized residuals", 
+     main = "standardized residuals plot (diatolic bp)")
+```
+
+From the residual plot of the systolic blood pressure, we can find the mean of the residual is almost 0, and the variance seems to be almost constant. Also, we have the same finds for the diatolic blood pressure. Therefore, the assumption of homoscedasticity can be considered as satisfied.
+
+\
+2. No or little multicollinearity
+
+\
+In order to check the no/little-multicollinearity assumption, we computed the Pearson correlations between the continuous independent variables and Chi-squared correlation test between the binary independent variables.
+
+```{r dt continuous correlations}
+cov_mat = vcov(pre_sys_fit)
+cov_mat[-1, -1] 
+```
+```{r dt factors correlations}
+## check correlation between indicators
+gs = chisq.test(analysis_dt$gender, analysis_dt$smoke)
+gw = chisq.test(analysis_dt$gender, analysis_dt$workhrs)
+sw = chisq.test(analysis_dt$smoke, analysis_dt$workhrs)
+
+## make tables
+row = c("gender", "gender", "smoke")
+col = c("smoke", "workhrs", "workhrs")
+chi_sq_stats = c( gs$statistic, gw$statistic, sw$statistic )
+p_value = c(gs$p.value, gw$p.value, sw$p.value)
+
+m = as.data.table(cbind(row, col, chi_sq_stats, p_value))
+m
+```
+
+As shown in the heatmap of the correlations between the continuous independent variables, we can find that there are very small or almost no correlations between the continuous independent variables. Also, as the table of the Pearson correlations between the binary variables shows, we can find that there is little collinearity between each pair of the binary variables.
+
+\
+3. Linearity
+
+\
+In order to check the linearity assumption, we plotted partial regression plots for both systolic blood pressure and diatolic pressure against each of the independent variables.
+
+```{r check linearity systolic bp}
+avPlots(pre_sys_fit)
+```
+
+```{r check linearity diatolic bp}
+avPlots(pre_dia_fit)
+```
+
+From the partial regression plots of the systolic blood pressure, we can find that for each of the independent variable, the expected value of the dependent variable (systolic blood pressure) is indeed a straight-line function of the independent variable, holding the others fixed. Also, from the partial regression plots of the diatolic blood pressurewe, we can get the same conclusion. Therefore, the assumption of linearity can be considered as satisfied.
+
+
+# additional analysis 
+
+After examing the mutiple linear regression in the core analysis, I'm interested in a more complicated model considering intercations and transformations to adjust the non-linearity and non-constant variance.
+
+\
+The following model considers the logarithm of average systolic blood pressure. For variables alchol and sleep, the model apply them into basis splines function with degrees of freedom 5 and order of three, with 2 knots. Interaction effect between worhrs and all other variables are considered. The estimations and significance level are reported in the following:
+
+```{r}
+fit_sys = lm( log(avg_sys_bp) ~ workhrs * (age + gender + bmi + bs(alchol, 5) + 
+                                             bs(sleep, 5) + smoke) + smoke:alchol,
+              data = dt)
+
+summary(fit_sys)
+AIC(fit_sys)
+```
+
+The model has R-squared 0.2317. The F-test against the null model calcutes the statistic of 2.081 with 30 and 207 degrees of freedom. The p-value is 0.00154, which suggests the statistical significance of this model in 0.05 confidence level. The AIC of this model is -252.428.
+
+```{r}
+vif(fit_sys)
+```
+
+When checking the variance inflation factor, I find that workhrs, workhrs:age, and workhrs:bmi are greatly inflated (more than 5). It suggests that there might be significant effect of collinearity, which may unstable the coefficients estimations.
+
+```{r}
+par( mfrow = c(2,2) )
+plot(Effect("age", fit_sys, partial.residuals = TRUE))
+plot(Effect("bmi", fit_sys, partial.residuals = TRUE))
+plot(Effect("alchol", fit_sys, partial.residuals = TRUE))
+plot(Effect("sleep", fit_sys, partial.residuals = TRUE))
+```
+
+Above plots examine the effect of each continuous variables in the model on the response variable. The blue lines shows the relationship from the model. The red dots are partial residuals and the red line shows how each variable correlates to the response variable after controlling all other variables. We see that our model dose quite well on explaining the correlation for age, bmi and alchol. The basis spline function of Sleep, as we can see, become very unstable at the boundary points. This might suggests extrapolation bias.
+
+The coefficients of this model is very hard to interpret, even though the model roughly satisfies the linear modeling assumptions. However, the model is still useful to explain several research questions. In the following example, I examine if sleep for 5 hours would cause significant difference on blood pressure than sleep for 8 hours if they both work overtimes.
+
+To answer the question, if we directly use the model, we need to consider interaction terms on variables interested, and coefficients of basis splines transformation on sleep are more meaningful in mathematic rather than practical setting. 
+
+The code below create two fake datasets accroding to the original dataset. One with all sleep equals to 8 while the other equal to 5. Both dataset has workhrs as 1. After combining the original dataset with two fake datasets, we assign weights 1 to all original observations and zero to all fake observations. The purpose of assigning weights is to get the same coefficients with the previously fitted model and the same structure of the design matrix (same interactions and transformation, but with fake data). Above steps help us to get the contrast value by applying the model coefficients to our data generated by test assumptions.
+
+```{r}
+# would difference between work overtimes but sleep for 8 hours and work overtimes 
+# while sleep for 5 hours less significant?
+dt = dt[, wgt := 1]
+
+d_fake_8hrs = copy(dt)
+d_fake_8hrs[, `:=` (workhrs = 1, sleep = 8, wgt = 0)] # make fake data with contrast
+
+d_fake_5hrs = copy(dt)
+d_fake_5hrs[, `:=` (workhrs = 1, sleep = 5, wgt = 0)] # make fake data with contrast
+
+dx = rbindlist( list(dt, d_fake_8hrs, d_fake_5hrs) ) # combine tru data with fake data
+
+result = lm( log(avg_sys_bp) ~ workhrs * (age + gender + bmi + bs(alchol, 5) + 
+                                             bs(sleep, 5) + smoke) + smoke:alchol,
+             weights = wgt, data = dx) # fit regression with zero weights on fake data
+
+pa = coef(result) # parameters
+cm = vcov(result) # covariance matrix
+dm = model.matrix(result) # design matrix
+nx = 238
+
+ct = dm[ (nx+1):(nx+2*nx), ]
+ct = ct[1:nx,] - ct[(nx+1):(2*nx), ] # get the contrast
+
+znum = ct %*% pa # numerator of z-score
+zdenom = sqrt(diag(ct %*% cm %*% t(ct))) # denominator of z-score
+zscores = znum / zdenom
+
+z_criticle = qnorm(0.975)
+
+{mean(zscores) > z_criticle}
+```
+
+The z-score is 0.864, which is lesser than 1.96. We failed to reject the null hypothesis that sleep 5 hours would cause difference in blood pressur than sleep 8 hours if both people work overtimes.

@@ -1,0 +1,219 @@
+---
+title: "hysue_write_up"
+output: html_document
+---
+
+```{r dplyr setup, include=FALSE}
+#This script include initial and main analyses for the STATS506 group project.
+#"Does working overtime predict abnormal blood pressure?"
+#Author: Hyesue Jang
+
+rm(list=ls())
+library(dplyr)
+library(tidyr) #for drop_na() function
+library(nlme)
+
+#read in data
+df = read.csv("final_data.csv", header = TRUE)
+df = as_tibble(df)
+
+#names(df)
+df = df %>% 
+  mutate(
+    #factor categorical variables
+    gender = factor(df$gender, 
+                    levels = c(1,2), 
+                    labels = c("male","female")),
+    alcohol_unit = factor(df$alcohol_unit,
+                          levels = c(1,2,3),
+                          labels = c("week", "month", "year")),
+    smoke = factor(df$smoke,
+                   levels = c(1,2),
+                   labels = c("Smoked", "NotSmoked")),
+    #compute overtime variable
+    overtime = ifelse(workhrs > 40, 1, 0),
+    #compute average BP measures
+    SBP = rowMeans(cbind(BPXSY1, BPXSY2, BPXSY3, BPXSY4), na.rm = T),
+    DBP = rowMeans(cbind(BPXDI1, BPXDI2, BPXDI3, BPXDI4), na.rm = T),
+    #compute abnormal BP variables
+    SBP_bi = ifelse(SBP < 140, 0, 1),
+    DBP_bi = ifelse(DBP < 90, 0, 1)) %>%
+  drop_na(c("SBP", "DBP"))
+#remove those with incomplete BP measures 
+df = quantable::removeNArows(df, 2)
+#recode alcohol variables
+#measure of units differ by respondent (week, month, year)
+df$alcohol_adj = df$alcohol
+df$alcohol_adj[df$alcohol_unit == "month"] = df$alcohol_adj[df$alcohol_unit == "month"] / 4.345 #divide by average weeks per month
+df$alcohol_adj[df$alcohol_unit == "year"] = df$alcohol_adj[df$alcohol_unit == "year"] / 52.143 #divide by average weeks per year
+```
+
+As we have got a nice cleaned dataset, we want to visualize our data with pair plots first. As shown in the pair plots for the systolic blood pressure, specifically from the scatter plots, we can find that there are weak relations or almost no relations between the variables. Moreover, from the histograms, we can find that the all the variables seem not to be normally distributed. Athough the variable systolic blood pressure and the variable bmi approach to be normally distributed, they are still right skewed. In addition, as shown in the pair plots for the diatolic blood pressure, from the scatter plots, again, we can find that there are weak relations or almost no relations between the variables. Also, from the histograms, except that the variable diatolic blood pressure seems to be almost normally distributed (only a little bit left skewed), all the other variables are not normally distributed.
+
+\
+```{r preliminary analyses}
+#test the assumptions for the linear regression
+#assumption1) normality assumption: check if the continuous variables are normal
+par( mfrow=c(3,3) )
+#DVs
+hist(df$SBP)
+hist(df$DBP)
+#IVs
+hist(df$age)
+hist(df$bmi)
+hist(df$sleep)
+hist(df$alcohol_adj)
+
+#check the distributions
+hist(df$overtime)
+hist(df$SBP_bi)
+hist(df$DBP_bi)
+```
+
+```{r dplyr_matrix_plot}
+#for SPB
+pairs(SBP ~ overtime + gender + age + bmi +
+        alcohol_adj + sleep + smoke, data = df)
+```
+```{r dplyr_matrix_plot2}
+#for DBP
+pairs(DBP ~ overtime + gender + age + bmi + 
+        alcohol_adj + sleep + smoke, data = df)
+
+```
+
+We want to check whether the following assumptions of the linear regression model are held:
+
+\
+1. Homoscedasticity: The variance of the residual is constant. 
+2. Linearity: The relationship between between the independent and dependent variables is linear.
+3. No or little multicollinearity: There is no or little collinearity between independent variables.
+
+\
+1. Linearity
+
+\
+In order to check the linearity assumption, we plotted partial regression plots for both systolic blood pressure and diatolic pressure against each of the independent variables.
+
+\
+```{r assumption linearity}
+#assumption3) linearity
+#first fit a linear regression with all covariates
+avplot_SBP = lm(SBP ~ overtime + gender + age + bmi + 
+                  alcohol_adj + sleep + smoke, data = df)
+avplot_DBP = lm(DBP ~ overtime + gender + age + bmi + 
+                  alcohol_adj + sleep + smoke, data = df)
+#then see the added variable plots
+car::avPlots(avplot_SBP) #for SBP
+```
+```{r avplots_DBP}
+car::avPlots(avplot_DBP) #for DBP
+```
+
+From the partial regression plots of the systolic blood pressure, we can find that for each of the independent variable, the expected value of the dependent variable (systolic blood pressure) is indeed a straight-line function of the independent variable, holding the others fixed. Also, from the partial regression plots of the diatolic blood pressurewe, we can get the same conclusion. Therefore, the assumption of linearity can be considered as satisfied.
+
+\
+2. Homoscedasticity
+
+\
+In order to check the homoscedasticity assumption, we plotted residual plots for both systolic blood pressure and diatolic pressure.
+
+```{r assumption Homoscedasticity SBP}
+#standardized residuals plot
+#SBP
+SBP_red = rstandard(avplot_SBP)
+fitted_SBP = avplot_SBP$fitted.values
+
+plot(fitted_SBP, SBP_red, xlab = "Fitted Values", 
+     ylab = "Standardized Residuals", 
+     main = "Standardized Residuals Plot (SBP)")
+```
+```{r assumption Homoscedasticity DBP}
+#DBP
+DBP_red = rstandard(avplot_DBP)
+fitted_DBP = avplot_DBP$fitted.values
+
+plot(fitted_DBP, DBP_red, xlab = "Fitted Values", 
+     ylab = "Standardized Residuals", 
+     main = "Standardized Residuals Plot (DBP)")
+```
+
+From the residual plot of the systolic blood pressure, we can find the mean of the residual is almost 0, and the variance seems to be almost constant. Also, we have the same finds for the diatolic blood pressure. Therefore, the assumption of homoscedasticity can be considered as satisfied.
+
+\
+2. No or little multicollinearity
+
+\
+In order to check the no/little-multicollinearity assumption, we computed the Pearson correlations between the continuous independent variables and Chi-squared correlation test between the binary independent variables.
+
+```{r collinearity for continuous variables}
+#collinearity for continuous variables
+cont_df = df %>% 
+  select(age, bmi, alcohol_adj, sleep)
+cor(cont_df) 
+#correlation coefficients have small values
+
+```
+```{r collinearity for categorical variables}
+#collinearity for categorical variables
+cate_df = df %>%
+  select(gender, smoke, overtime)
+chisq.test(cate_df$gender, cate_df$smoke)
+chisq.test(cate_df$gender, cate_df$overtime)
+chisq.test(cate_df$smoke, cate_df$overtime)
+#no significant associations
+```
+
+As shown in the heatmap of the correlations between the continuous independent variables, we can find that there are very small or almost no correlations between the continuous independent variables. Also, as the table of the Pearson correlations between the binary variables shows, we can find that there is little collinearity between each pair of the binary variables.
+
+\
+We fit our linear regression models.
+
+\
+For the systolic blood pressure, we fit the model: 
+
+$$
+\begin{aligned}
+ y &= \beta_{0} + \beta_{workhrs}*x_{workhrs} + \beta_{gender}*x_{gender} + \beta_{age}*x_{age} + \beta_{bmi}*x_{bmi} \notag\\
+ &+ \beta_{sleep}*x_{sleep} + \beta_{smoke}*x_{smoke} + \beta_{avg\_alcohol\_freq\_wk}*x_{avg\_alcohol\_freq\_wk} + \epsilon
+\end{aligned}
+$$
+
+And for diatolic blood pressure, we fit the model: 
+$$
+\begin{aligned}
+ y &= \beta_{0} + \beta_{workhrs}*x_{workhrs} + \beta_{gender}*x_{gender} + \beta_{age}*x_{age} + \beta_{bmi}*x_{bmi} \notag\\
+ &+ \beta_{sleep}*x_{sleep} +  \beta_{smoke}*x_{smoke} + \beta_{avg\_alcohol\_freq\_wk}*x_{avg\_alcohol\_freq\_wk} + \epsilon
+\end{aligned}
+$$
+
+```{r modeling SBP}
+#core analysis ----------------------------------------------
+#linear regression with "overtime" as the main predictor
+model_SBP = gls(SBP ~ overtime + gender + age + bmi + 
+                  alcohol_adj + sleep + smoke, data = df)
+summary(model_SBP)
+```
+```{r modeling DBP}
+model_DBP = gls(DBP ~ overtime + gender + age + bmi + 
+                  alcohol_adj + sleep + smoke, data = df)
+summary(model_DBP)
+```
+
+From the summary results of the linear regression model for the systolic blood pressure, we can find that although the coefficient of the working hours is positive, which implies that working overtime increases the risk of high systolic blood pressure, this effect is not significant ($\beta = 1.58$, p = 0.557). As a result, we can conclude that working overtime cannot lead to abnormal systolic blood pressure. Besides, from the summary results of the linear regression model for the diatolic blood pressure, we can find that although the coefficient of the working hours is positive as well, which implies that working overtime increases the risk of high diatolic blood pressure too, this effect is not significant as well($\beta = 0.2246$, p = 0.905). As a result, we can conclude that working overtime also cannot lead to abnormal diatolic blood pressure. Therefore, in conclusion, working overtime also cannot lead to abnormal blood pressure.
+
+```{r additional analysis SBP} 
+#logistic regression with normal vs. abnormal BP outcome
+logistic_SBP <- glm(SBP_bi ~ overtime + gender + age + bmi + 
+                      alcohol_adj + sleep + smoke,
+                    family = binomial(link = 'logit'),
+                    data = df)
+summary(logistic_SBP)
+```
+```{r additional analysis DBP} 
+logistic_DBP <- glm(DBP_bi ~ overtime + gender + age + bmi + 
+                      alcohol_adj + sleep + smoke,
+                    family = binomial(link = 'logit'),
+                    data = df)
+summary(logistic_DBP)
+```
