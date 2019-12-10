@@ -1,9 +1,4 @@
----
-title: "Core Analysis"
-output: html_document
----
-
-```{r setup, include=FALSE}
+```{r package, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(data.table)
 library(magrittr)
@@ -17,7 +12,7 @@ dt = fread("cleaned_data.csv")
 analysis_dt = fread("cleaned_data.csv")
 ```
 
-As we have got a nice cleaned dataset, we want to visualize our data with pair plots first. As shown in the pair plots for the systolic blood pressure, specifically from the scatter plots, we can find that there are weak relations or almost no relations between the variables. Moreover, from the histograms, we can find that the all the variables seem not to be normally distributed. Athough the variable systolic blood pressure and the variable bmi approach to be normally distributed, they are still right skewed. In addition, as shown in the pair plots for the diatolic blood pressure, from the scatter plots, again, we can find that there are weak relations or almost no relations between the variables. Also, from the histograms, except that the variable diatolic blood pressure seems to be almost normally distributed (only a little bit left skewed), all the other variables are not normally distributed.
+After data cleaning, we visualized our data with the matrix plots first. As shown in the matrix plots for the systolic blood pressure, we found that there were weak correlations between the variables. As for diastolic blood pressure, the matrix plots show that there are weak relations or almost no relations between the variables. Moreover, from the histograms, we found that some variables were not normally distributed; however, most variables, including systolic and diastolic blood pressure, were normally distributed.
 
 ```{r matrix_plot}
 pairs( ~avg_sys_bp + gender + age + bmi + sleep + smoke + workhrs +
@@ -37,10 +32,10 @@ hist(analysis_dt$sleep)
 hist(analysis_dt$alchol)
 ```
 
-After exploring the data through vizualizing with pair plots, we fit our linear regression models.
+After the preliminary analysis on the data, we fitted our linear regression models.
 
 \
-For the systolic blood pressure, we fit the model: 
+For the systolic blood pressure, we fitted the following model: 
 
 $$
 \begin{aligned}
@@ -49,7 +44,7 @@ $$
 \end{aligned}
 $$
 
-And for diatolic blood pressure, we fit the model: 
+For diastolic blood pressure, we fitted the following model:  
 $$
 \begin{aligned}
  y &= \beta_{0} + \beta_{workhrs}*x_{workhrs} + \beta_{gender}*x_{gender} + \beta_{age}*x_{age} + \beta_{bmi}*x_{bmi} \notag\\
@@ -72,21 +67,21 @@ pre_dia_fit = lm(avg_dia_bp ~ gender + age + sleep + smoke + workhrs + alchol,
 summary(pre_dia_fit)
 ```
 
-From the summary results of the linear regression model for the systolic blood pressure, we can find that although the coefficient of the working hours is positive, which implies that working overtime increases the risk of high systolic blood pressure, this effect is not significant ($\beta = 1.58$, p = 0.557). As a result, we can conclude that working overtime cannot lead to abnormal systolic blood pressure. Besides, from the summary results of the linear regression model for the diatolic blood pressure, we can find that although the coefficient of the working hours is positive as well, which implies that working overtime increases the risk of high diatolic blood pressure too, this effect is not significant as well($\beta = 0.2246$, p = 0.905). As a result, we can conclude that working overtime also cannot lead to abnormal diatolic blood pressure. Therefore, in conclusion, working overtime also cannot lead to abnormal blood pressure.
+From the summary results of the linear regression model for the systolic blood pressure, we found the coefficient of the working hours is positive, which implies that working overtime increases systolic blood pressure level; however, this effect is not significant ($\beta = 1.58$, p = 0.557). As a result, we can conclude that working overtime is not significantly correlated to systolic blood pressure. Similarly, from the summary results of the linear regression model for diastolic blood pressure, we found that the coefficient of the working hours is positive, which implies that working overtime increases diastolic blood pressure level; however, this effect was not significant as well ($\beta = 0.2246$, p = 0.905). As a result, we conclude that working overtime is not significantly correlated to diastolic blood pressure.
 
 \
-After fitting the linear regression model, we want to check whether the following assumptions of the linear regression model are held:
+After fitting the linear regression model, we checked whether the following assumptions of the linear regression model are held:
 
 \
 1. Homoscedasticity: The variance of the residual is constant. 
-2. Linearity: The relationship between between the independent and dependent variables is linear.
+2. Linearity: The relationship between the independent and dependent variables is linear.
 3. No or little multicollinearity: There is no or little collinearity between independent variables.
 
 \
 1. Homoscedasticity
 
 \
-In order to check the homoscedasticity assumption, we plotted residual plots for both systolic blood pressure and diatolic pressure.
+In order to check the homoscedasticity assumption, we plotted standardized residuals against fitted values plots for both systolic blood pressure and diastolic blood pressure.
 
 ```{r residuals plot}
 par( mfrow=c(1,2) )
@@ -107,13 +102,13 @@ plot(fitted_dia, st_dia_red, xlab = "fitted values",
      main = "standardized residuals plot (diatolic bp)")
 ```
 
-From the residual plot of the systolic blood pressure, we can find the mean of the residual is almost 0, and the variance seems to be almost constant. Also, we have the same finds for the diatolic blood pressure. Therefore, the assumption of homoscedasticity can be considered as satisfied.
+From the standardized residuals plot of the systolic blood pressure, we could find the mean of the residual was roughly 0, and the variance was roughly constant. Also, we had the same findings for diastolic blood pressure. Therefore, the assumption of homoscedasticity could be considered as satisfied.
 
 \
 2. No or little multicollinearity
 
 \
-In order to check the no/little-multicollinearity assumption, we computed the Pearson correlations between the continuous independent variables and Chi-squared correlation test between the binary independent variables.
+In order to check the multicollinearity, we computed the Pearson correlations between each two continuous independent variables and conducted Chi-squared correlation test between each two binary independent variables.
 
 ```{r dt continuous correlations}
 cov_mat = vcov(pre_sys_fit)
@@ -135,13 +130,13 @@ m = as.data.table(cbind(row, col, chi_sq_stats, p_value))
 m
 ```
 
-As shown in the heatmap of the correlations between the continuous independent variables, we can find that there are very small or almost no correlations between the continuous independent variables. Also, as the table of the Pearson correlations between the binary variables shows, we can find that there is little collinearity between each pair of the binary variables.
+As shown in the correlation table between each two continuous variables, we could find that there are very small or almost no correlations between the continuous independent variables. Also, as the table of the Pearson chi-squared correlation test results showed, we could find that there is little collinearity between each pair of the binary variables.
 
 \
 3. Linearity
 
 \
-In order to check the linearity assumption, we plotted partial regression plots for both systolic blood pressure and diatolic pressure against each of the independent variables.
+In order to check the linearity assumption, we plotted partial regression plots for both systolic blood pressure and diastolic pressure against each of the independent variables.
 
 ```{r check linearity systolic bp}
 avPlots(pre_sys_fit)
@@ -151,10 +146,10 @@ avPlots(pre_sys_fit)
 avPlots(pre_dia_fit)
 ```
 
-From the partial regression plots of the systolic blood pressure, we can find that for each of the independent variable, the expected value of the dependent variable (systolic blood pressure) is indeed a straight-line function of the independent variable, holding the others fixed. Also, from the partial regression plots of the diatolic blood pressurewe, we can get the same conclusion. Therefore, the assumption of linearity can be considered as satisfied.
+From the partial regression plots of the systolic blood pressure, we could find that for each of the independent variables, the expected value of the dependent variable (systolic blood pressure) was indeed a linear function of the independent variable, controlled by all the other variables. We can get the same conclusion from the partial regression plots of diastolic blood pressure. Therefore, the assumption of linearity can be considered as satisfied.
 
 
-# additional analysis 
+#### additional analysis 
 
 After examing the mutiple linear regression in the core analysis, I'm interested in a more complicated model considering intercations and transformations to adjust the non-linearity and non-constant variance.
 
@@ -188,10 +183,13 @@ plot(Effect("sleep", fit_sys, partial.residuals = TRUE))
 
 Above plots examine the effect of each continuous variables in the model on the response variable. The blue lines shows the relationship from the model. The red dots are partial residuals and the red line shows how each variable correlates to the response variable after controlling all other variables. We see that our model dose quite well on explaining the correlation for age, bmi and alchol. The basis spline function of Sleep, as we can see, become very unstable at the boundary points. This might suggests extrapolation bias.
 
+\
 The coefficients of this model is very hard to interpret, even though the model roughly satisfies the linear modeling assumptions. However, the model is still useful to explain several research questions. In the following example, I examine if sleep for 5 hours would cause significant difference on blood pressure than sleep for 8 hours if they both work overtimes.
 
+\
 To answer the question, if we directly use the model, we need to consider interaction terms on variables interested, and coefficients of basis splines transformation on sleep are more meaningful in mathematic rather than practical setting. 
 
+\
 The code below create two fake datasets accroding to the original dataset. One with all sleep equals to 8 while the other equal to 5. Both dataset has workhrs as 1. After combining the original dataset with two fake datasets, we assign weights 1 to all original observations and zero to all fake observations. The purpose of assigning weights is to get the same coefficients with the previously fitted model and the same structure of the design matrix (same interactions and transformation, but with fake data). Above steps help us to get the contrast value by applying the model coefficients to our data generated by test assumptions.
 
 ```{r}

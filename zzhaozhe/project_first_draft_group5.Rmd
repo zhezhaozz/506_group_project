@@ -1,92 +1,98 @@
 ---
-title: "First_draft_group5"
+title: "Project_group5"
 output: html_document
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-```{css echo=FALSE, include=FALSE}
-#r-markdown  {
-  margin-top: 6em;
-}
-
-#r-markdown p:first-of-type {
-  margin-bottom: 3em;
-}
-```
 
 # Introduction
 
-According to the American Time Use Survey (ATUS, https://www.bls.gov/charts/american-time-use/activity-by-work.htm), 85.8 percent of males and 66.5 percent of females work more than 40 hours per week in the U.S. Working overtime has been associated with diverse health problems, especially ischemic heart diseases and cerebrovascular diseases (Nishiyama & Johnson, 1997). Therefore, this project aims to examine whether working overtime is associated with the blood pressure level using the National Health and Nutrition Examination Survey (NHANES) data. In order to produce sufficient estimation sample size, this study use a pooled data from the three two-year cycle data sets: 2011-2012, 2013-2014, and 2015-2016.
+According to the American Time Use Survey (ATUS, https://www.bls.gov/charts/american-time-use/activity-by-work.htm), 85.8 percent of males and 66.5 percent of females work more than 40 hours per week in the U.S. Working overtime has been associated with diverse health problems, especially ischemic heart diseases and cerebrovascular diseases (Nishiyama & Johnson, 1997). Therefore, this project aims to examine whether working overtime is associated with the blood pressure level using the National Health and Nutrition Examination Survey (NHANES) data. In order to produce sufficient estimation sample size, this study uses a pooled data from the three two-year cycle data sets: 2011-2012, 2013-2014, and 2015-2016.
 
 \
-It is well known that various biological and environmental factors influence the blood pressure level (Lauer, 1993; Papathanasiou, 2015). To control for the potential influences of such factors, we have systematically reviewed the literature to select the important factors that might affect the abnormal blood pressure levels of the respondents. Final predictors included in the model were gender, age, body mass index (BMI), alcohol consumption level, hours of sleep, and history of smoking. These final predictors closely matched with those from other published studies that observed the association between work hours and blood pressure levels  (Hayashi, 1996; Nakamura et al. 2012).
+It is well known that various biological and environmental factors influence the blood pressure level (Lauer, 1993; Papathanasiou, 2015). To control for the potential influences of such factors, we have systematically reviewed the literature to select the important factors that might affect the blood pressure levels of the respondents. Final predictors, other that working hours, includes in the model were gender, age, body mass index (BMI), alcohol consumption level, hours of sleep, and history of smoking. These final predictors closely match with those from other published studies that observed the association between work hours and blood pressure levels  (Hayashi, 1996; Nakamura et al. 2012).
 
 \
-In terms of defining the criteria for the key variables of interest, working overtime were defined as working more than 40 hours per week. For the additional logistic regression analyses, abnormal blood pressure was defined as having systolic blood pressure higher than 140mm Hg and diastolic blood pressure higher than 90mm Hg following the guide from the American Heart Association. 
+In terms of defining the criteria for the key variables of interest, working overtime is defined as working more than 40 hours per week. For the additional logistic regression analyses, abnormal blood pressure is defined as having systolic blood pressure higher than 140mm Hg and diastolic blood pressure higher than 90mm Hg following the guide from the American Heart Association. 
 
 \
 
 # Data Selction and Cleaning
 
-The study population are participants, aged 18 - 60 and employed, of The National Health and Nutrition Examination Survey (NHANES) program in three two-years cycles: 2011-2012, 2013-2014 and 2015-2016. Among them, 2011-2012 cycle consists of 2495 sample size, 2013-2014 cycle contains 2819 and 2015-2016 cycle includes 2799. For the purpose of this study, we exclude people who are now taking prescription due to hypertension. The exclusion leads to huge amount of reduction to our sample size: there are 100 observations left for 2011-2012, 95 for 2013-2014 and 140 for 2015-2016.
+The study population are participants, aged 18 - 60 and employed, of The National Health and Nutrition Examination Survey (NHANES) program in three two-years cycles: 2011-2012, 2013-2014 and 2015-2016. Among them, 2011-2012 cycle consists of 2,495 sample size, 2013-2014 cycle contains 2,819 and 2015-2016 cycle includes 2,799. For the purpose of this study, we exclude people who are now taking prescription due to hypertension. The exclusion leads to huge amount of reduction to our sample size: there are 100 observations left for 2011-2012, 95 for 2013-2014 and 140 for 2015-2016.
 
 \
-Among 335 total sample sizes, we picked variables through literature reviews and group discussion. Dataset varies for each two-years cycle by the suffix in the name. 2011-2012 is G, 2013-2014 is H, and 2015-2016 is I. For the convenience, the suffix will be replaced by *. Variables chosen are listed below:
+Among 335 total sample sizes, we pick variables through literature reviews and group discussion. Dataset varies for each two-years cycle by the suffix in the name. 2011-2012 is G, 2013-2014 is H, and 2015-2016 is I. For the convenience, the suffix will be replaced by *. Variables chosen by this project are listed below:
 
 \
-The measurements of blood pressure: Systolic blood pressure and Diastolic blood pressure from BPX_* dataset. Each blood pressure are measured in 3 trails, sometimes 4 trials,
+The measurements of blood pressure: Systolic blood pressure and Diastolic blood pressure from BPX_* dataset. Each blood pressure is measured in 3 trials, sometimes 4 trials,
 
 \
-working hours in the last week from OCQ_* dataset,
+Working hours in the last week from OCQ_* dataset,
 
 \
 Body mass index from BMX_* dataset,
 
 \
-demographic data: age and gender from DEMO_* dataset,
+Demographic data: age and gender from DEMO_* dataset,
 
 \
-Alchol use in the last 12 months: ALQ120Q for the quantity and ALQ120U to differentiate unit of week, month or year, from ALQ_* dataset,
+Alchol used in the last 12 months: ALQ120Q for the quantity and ALQ120U to differentiate unit of week, month or year, from ALQ_* dataset,
 
 \
 Smoked tobacco in last five days: SMQ681 in 2013-2016, and SMQ680 in 2011-2012, from SMQRTU_* dataset,
 
 \
-sleeping hours in working days: SLD012 in 2015-2016, and SLD010H for others from SLQ_* dataset.
+Sleeping hours in working days: SLD012 in 2015-2016, and SLD010H for others from SLQ_* dataset.
 
 \
-The cleaning process involves excluding missing values for complete case analysis, and excludig cases where there are more than 2 trails blood pressure measurements missing. After the cleaning process, the sample size for this study is 238 in total.
+The cleaning process involves excluding missing values for complete case analysis, and excludig cases where there are more than 2 trials blood pressure measurements missing. After the cleaning process, the sample size for this study is 238 in total.
 
 
 # Method
 
-This study will implement multiple regression on each type (systolic and diatolic) blood pressure against working hours controlled by all other variables to assess if working overtimes would causehigher blood pressure. Coefficients and their p-value on statistic significance are reported.
+This study implements multiple regression on each type (systolic and diatolic) blood pressure against working hours controlled by all other variables to assess if working overtimes would cause higher blood pressure. Coefficients and their p-values on statistic significance are reported.
 
 \
-The response variable blood pressure will be the average value of blood pressures measured in 3 trails (sometimes 4 if one trial is missing); working hours is encoded into dichotomy variable where 1 stands for working more than 40 hours and 0 otherwise; alchol drinks are converted to average drinks in a week, so values with unit month is divided by 4.345 and 52.143 for values with unit year. 3 digits are preserved; due to the difference of encoding of sleep variable in 2015-2016 (it has 14 meaning more 14 hours, but this limit is 12 in 2011-2014), we recode all sleep hours that are more than 12 to 12 to keep the consistency in sample dataset.
+The response variable blood pressure is the average value of blood pressures measured in 3 trials (sometimes 4 if one previous trial is missing); the variable working hours is encoded into dichotomy variable where 1 stands for working more than 40 hours and 0 otherwise; alchol drinks are converted to average drinks in a week, so values with unit month are divided by 4.345 and by 52.143 for values with unit year. 3 digits are preserved; due to the difference of encoding of sleep variable in 2015-2016 (it has 14 meaning more 14 hours, but this limit is 12 in 2011-2014), we recode all sleep hours that are more than 12 to 12 to keep the consistency in sample dataset.
 
 \
-The additional analysis involves adding interactions, transformations to our classical linear model. Logistics regression is applied to solve the research question in a different thinking.
+The additional analysis involves adding interactions, transformations to our classical linear model. Logistics regression is applied to examine the associations between the predictors and the risk of having abnormal blood pressure.
 
 \
 We use data.table package, dplyr package and python for the data preparation process. The multiple regression is implemented in python, lm function and gls function in R.
 
-## core analysis {.tabset .tabset-fade}
+## core analysis and results {.tabset .tabset-fade}
 
-### R_data.table
-```{r Zhe setup}
-htmltools::includeHTML("Zhe_write_up.html")
+### lm and R_data.table
+
+```{r Zhe, child = 'Zhe_write_up.Rmd'}
 ```
 
-### R_dplyr
-```{r Hyesue setup}
-htmltools::includeHTML("hyesue_write_up.html")
+### GLS and R_dplyr
+
+```{r Hyesue, child = 'hyesue_write_up.Rmd'}
 ```
 
 ### Python
-```{r Tian setup}
+
+```{r Tian}
 htmltools::includeHTML("Tian.html")
 ```
 
-##
+# References
+
+Hayashi, T., Kobayashi, Y., Yamaoka, K., & Yano, E. (1996). Effect of overtime work on 24-hour ambulatory blood pressure. Journal of occupational and environmental medicine, 38(10), 1007-1011.
+
+\
+Lauer, R. M., Mahoney, L. T., Clarke, W. R., & Witt, J. (1993). Childhood predictors for high adult blood pressure: the Muscatine Study. Pediatric Clinics of North America, 40(1), 23-40.
+
+\
+Nakamura, K., Sakurai, M., Morikawa, Y., Miura, K., Ishizaki, M., Kido, T., ... & Nakagawa, H. (2012). Overtime work and blood pressure in normotensive Japanese male workers. American journal of hypertension, 25(9), 979-985.
+
+\
+Nishiyama, K., & Johnson, J. V. (1997). Karoshi--death from overwork: occupational health consequences of Japanese production management. International Journal of Health Services, 27(4), 625-641.
+
+\
+Papathanasiou, G., Zerva, E., Zacharis, I., Papandreou, M., Papageorgiou, E., Tzima, C., ... & Evangelou, A. (2015). Association of high blood pressure with body mass index, smoking and physical activity in healthy young adults. The open cardiovascular medicine journal, 9, 5.
