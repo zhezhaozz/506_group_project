@@ -17,3 +17,5 @@ Tools used by each members:
 
 Collaboration: We worked on our own branch and checked each other's code by pulling the repo (and all branches). 
 Final works were merged to the master.
+
+File descriptions: See the README.md files in the individual group member folders.
