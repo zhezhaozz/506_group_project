@@ -1,0 +1,17 @@
+# 506_group_project
+
+### Author: Zhe Zhao
+### Last modified: 12/10/2019
+### This README.md explains individual files included in "zzhaozhe" folder.
+
+This is a personal folder for the works completed by Zhe Zhao. The work was done as a part of STATS506 (Fall 2019) Group Project.
+
+1. data_cleaning.R script has codes for downloading dataset from the NHANES website and cleaning and reducing dataset for the further analysis.
+
+2. core_analysis.R script includes the codes for core analyses.
+
+3. additional analysis.Rmd script has the write-up for additional analysis
+
+4. Zhe_write_up.Rmd includes write-up, codes and results of the core and additional analyses. This file will be included in the final group project report.
+
+For questions, email zzhaozhe@umich.edu.
