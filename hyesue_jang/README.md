@@ -1,9 +1,9 @@
 # 506_group_project
 
 
-Author: Hyesue Jang
-Last modified: 12/10/2019
-This README.md explains individual files included in the folder, hyesue_jang.
+### Author: Hyesue Jang
+### Last modified: 12/10/2019
+### This README.md explains individual files included in "hyesue_jang" folder.
 
 This is a personal folder for the works completed by Hyesue Jang. The work was done as a part of STATS506 (Fall 2019) Group Project.
 
