@@ -1,9 +1,12 @@
 ---
 title: "Group Project Report (draft)"
 author: "Hyesue Jang"
-date: "12/3/2019"
+date: "12/5/2019"
 output: html_document
 ---
+
+This is a markdown file for the group project write-up. This file includes introduction, additional analysis, and reference sections.
+Last modified 12/5/2019
 
 # Introduction
 

@@ -17,3 +17,8 @@ Tools used by each members:
 
 Collaboration: We worked on our own branch and checked each other's code by pulling the repo (and all branches). 
 Final works were merged to the master.
+
+File descriptions:
+- Hyesue: See https://github.com/zzhaozhe-profolio/506_group_project/tree/master/hyesue_jang for the descriptions about the files included in "hyesue_jang" folder.
+- Zhe:
+- Tian:
