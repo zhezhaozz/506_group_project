@@ -1,3 +1,11 @@
+# Stats 506 group project
+# script for data cleaning 
+# data.table
+#
+# Author: Zhe Zhao
+# Last updated: Dec 10th
+
+
 library(haven)
 library(data.table)
 library(magrittr)

@@ -1,3 +1,10 @@
+# Stats 506 group project
+# script for core analysis
+# data.table, lm
+#
+# Author: Zhe Zhao
+# Last updated: Dec 10th
+
 library(data.table)
 library(magrittr)
 analysis_dt = fread("cleaned_data.csv")

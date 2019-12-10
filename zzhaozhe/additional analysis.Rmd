@@ -4,6 +4,13 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+# Stats 506 group project
+# script for additional analysis 
+# data.table, lm
+#
+# Author: Zhe Zhao
+# Last updated: Dec 10th
+
 knitr::opts_chunk$set(echo = TRUE)
 library(data.table)
 library(magrittr)
