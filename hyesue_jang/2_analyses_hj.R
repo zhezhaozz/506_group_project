@@ -1,6 +1,7 @@
 #This script include initial and main analyses for the STATS506 group project.
 #Project title: "Does working overtime predict abnormal blood pressure?"
 #Author: Hyesue Jang
+#Last modified: 12/05/2019
 
 rm(list=ls())
 library(dplyr)

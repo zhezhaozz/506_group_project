@@ -1,7 +1,12 @@
 ---
 title: "Hyesue (Core and Additional Analyses)"
+author: "Hyesue Jang"
+date: "12/10/2019"
 output: html_document
 ---
+
+This markdown file include the group project write-up for Hyesue Jang. This file includes the codes and the results for core and additional analysis parts.
+Last modified: 12/10/2019
 
 ```{r dplyr setup, include=FALSE}
 #This script include initial and main analyses for the STATS506 group project.

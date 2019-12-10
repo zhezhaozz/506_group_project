@@ -2,6 +2,7 @@
 #The dplyr package is used for data cleaning.
 #Author: Hyesue Jang
 #Acknowledgement: Zhe Zhao
+#Last modified 12/04/2019
 
 library(haven) #for reading XPT files
 library(dplyr)
