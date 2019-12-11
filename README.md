@@ -19,6 +19,6 @@ Collaboration: We worked on our own branch and checked each other's code by pull
 Final works were merged to the master.
 
 File descriptions:
-- Hyesue: See https://github.com/zzhaozhe-profolio/506_group_project/tree/master/hyesue_jang for the descriptions about the files included in "hyesue_jang" folder.
-- Zhe: See https://github.com/zzhaozhe-profolio/506_group_project/tree/master for the descriptions about the files included in "zzhaozhe" folder.
-- Tian:
+- Hyesue: See https://github.com/zzhaozhe-profolio/506_group_project/blob/master/hyesue_jang/README.md for the descriptions about the files included in "hyesue_jang" folder.
+- Zhe: See https://github.com/zzhaozhe-profolio/506_group_project/blob/master/zzhaozhe/README for the descriptions about the files included in "zzhaozhe" folder.
+- Tian: See https://github.com/zzhaozhe-profolio/506_group_project/blob/master/tian_wang/README.md for the descriptions about the files included in "tian_wang" folder.
