@@ -61,7 +61,7 @@ The response variable blood pressure is the average value of blood pressures mea
 The additional analysis involves adding interactions, transformations to our classical linear model. Logistics regression is applied to examine the associations between the predictors and the risk of having abnormal blood pressure.
 
 \
-We use data.table package, dplyr package and python for the data preparation process. The multiple regression is implemented in python, lm function and gls function in R.
+We use [data.table](https://github.com/zzhaozhe-profolio/506_group_project/blob/master/zzhaozhe/data_cleaning.R) package, [dplyr](https://github.com/zzhaozhe-profolio/506_group_project/blob/master/hyesue_jang/1_data_cleaning_hj.R) package and [python](https://github.com/zzhaozhe-profolio/506_group_project/blob/master/tian_wang/STATS506_Project.ipynb) for the data preparation process. The multiple regression is implemented in python, lm function and gls function in R.
 
 ## core analysis and results {.tabset .tabset-fade}
 
