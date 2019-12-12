@@ -1,12 +1,17 @@
 ---
-title: "Project_group5"
-output: html_document
+title: "Project_Group5"
+author: Hyesue Jang, Tian Wang, Zhe Zhao
+date: Dec 11, 2019
+output: 
+  rmarkdown::html_document:
+    toc: true
 ---
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Introduction
+## Introduction
 
 According to the American Time Use Survey (ATUS, https://www.bls.gov/charts/american-time-use/activity-by-work.htm), 85.8 percent of males and 66.5 percent of females work more than 40 hours per week in the U.S. Working overtime has been associated with diverse health problems, especially ischemic heart diseases and cerebrovascular diseases (Nishiyama & Johnson, 1997). Therefore, this project aims to examine whether working overtime is associated with the blood pressure level using the National Health and Nutrition Examination Survey (NHANES) data. In order to produce sufficient estimation sample size, this study uses a pooled data from the three two-year cycle data sets: 2011-2012, 2013-2014, and 2015-2016.
 
@@ -18,7 +23,7 @@ In terms of defining the criteria for the key variables of interest, working ove
 
 \
 
-# Data Selction and Cleaning
+## Data Selction and Cleaning
 
 The study population are participants, aged 18 - 60 and employed, of The National Health and Nutrition Examination Survey (NHANES) program in three two-years cycles: 2011-2012, 2013-2014 and 2015-2016. Among them, 2011-2012 cycle consists of 2,495 sample size, 2013-2014 cycle contains 2,819 and 2015-2016 cycle includes 2,799. For the purpose of this study, we exclude people who are now taking prescription due to hypertension. The exclusion leads to huge amount of reduction to our sample size: there are 100 observations left for 2011-2012, 95 for 2013-2014 and 140 for 2015-2016.
 
@@ -50,7 +55,7 @@ Sleeping hours in working days: SLD012 in 2015-2016, and SLD010H for others from
 The cleaning process involves excluding missing values for complete case analysis, and excludig cases where there are more than 2 trials blood pressure measurements missing. After the cleaning process, the sample size for this study is 238 in total.
 
 
-# Method
+## Method
 
 This study implements multiple regression on each type (systolic and diatolic) blood pressure against working hours controlled by all other variables to assess if working overtimes would cause higher blood pressure. Coefficients and their p-values on statistic significance are reported.
 
@@ -63,7 +68,7 @@ The additional analysis involves adding interactions, transformations to our cla
 \
 We use [data.table](https://github.com/zzhaozhe-profolio/506_group_project/blob/master/zzhaozhe/data_cleaning.R) package, [dplyr](https://github.com/zzhaozhe-profolio/506_group_project/blob/master/hyesue_jang/1_data_cleaning_hj.R) package and [python](https://github.com/zzhaozhe-profolio/506_group_project/blob/master/tian_wang/STATS506_Project.ipynb) for the data preparation process. The multiple regression is implemented in python, lm function and gls function in R.
 
-## core analysis and results {.tabset .tabset-fade}
+## Core Analysis and Results {.tabset .tabset-fade}
 
 ### lm and R_data.table
 
@@ -81,7 +86,7 @@ We use [data.table](https://github.com/zzhaozhe-profolio/506_group_project/blob/
 htmltools::includeHTML("Tian.html")
 ```
 
-# References
+## References
 
 Hayashi, T., Kobayashi, Y., Yamaoka, K., & Yano, E. (1996). Effect of overtime work on 24-hour ambulatory blood pressure. Journal of occupational and environmental medicine, 38(10), 1007-1011.
 
