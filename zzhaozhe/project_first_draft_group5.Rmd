@@ -82,7 +82,7 @@ We use [data.table](https://github.com/zzhaozhe-profolio/506_group_project/blob/
 
 ### Python
 
-```{r Tian}
+```{r Tian, echo=FALSE}
 htmltools::includeHTML("Tian.html")
 ```
 
