@@ -1,5 +1,7 @@
 # 506_group_project
 
+The final version of project is project_group5.html.
+
 This repo includes the group project work by Group 5. Our group members are Zhe Zhao, Tian Wang, and Hyesue Jang.
 
 
